@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:jms="http://www.springframework.org/schema/jms"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/jms
+        http://www.springframework.org/schema/jms/spring-jms.xsd
+       	http://www.springframework.org/schema/tx 
+		http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+
+    <bean id="jmsTemplate" class="com.xlr.demo.util.activemq.JmsInstance">
+        <!-- 区别它采用的模式为false是p2p为true是订阅 -->
+        <property name="pubSubDomain" value="false" /> 
+        <!-- deliveryMode, priority, timeToLive 的开关，要生效，必须配置为true，默认false-->    
+    	<property name="explicitQosEnabled" value="true" />     	  
+    	<!-- 发送模式  DeliveryMode.NON_PERSISTENT=1:非持久 ; DeliveryMode.PERSISTENT=2:持久-->    
+       	<property name="deliveryMode" value="2" />   
+       	<property name="receiveTimeout" value="10000"/><!-- 超时设置 -->
+    </bean>
+    <!-- 生产者线程池 -->
+	<bean id="proDuctTaskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+		<property name="corePoolSize" value="5" />
+		<property name="maxPoolSize" value="10" />
+		<property name="WaitForTasksToCompleteOnShutdown" value="true" />
+	</bean>
+	<bean id="jmsTransactionManager" class="org.springframework.jms.connection.JmsTransactionManager">
+		<property name="connectionFactory" ref="connectionFactory"></property>
+	</bean>
+	<tx:annotation-driven transaction-manager="jmsTransactionManager"  />
+    <!--<bean id="destination" class="org.apache.activemq.command.ActiveMQQueue">-->
+        <!--<constructor-arg index="0" value="${jms.monitor}"/>-->
+    <!--</bean>-->
+    <!--<bean id="queueListenerContainerPRO" class="org.springframework.jms.listener.DefaultMessageListenerContainer">-->
+        <!--<property name="connectionFactory" ref="connectionFactoryPRO"/>-->
+        <!--<property name="destination" ref="destination" />-->
+        <!--<property name="messageListener" ref="proMonitorListenter" />-->
+        <!--<property name="concurrency" value="10"></property>-->
+    <!--</bean>-->
+    <!--<jms:listener-container concurrency="0-10" destination-type="queue" container-type="default" connection-factory="connectionFactory" acknowledge="auto">-->
+        <!--<jms:listener destination="${jms.taskHalf}" ref="taskHalfListenter"/>-->
+    <!--</jms:listener-container>-->
+</beans>

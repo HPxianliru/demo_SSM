@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:jaxws="http://cxf.apache.org/jaxws"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+  		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/task
+        http://www.springframework.org/schema/task/spring-task-4.3.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-4.3.xsd ">
+
+    <!-- 自动扫描bean -->
+    <!-- 启用autowire -->
+    <context:annotation-config />
+    <!-- task任务扫描注解 -->
+    <task:annotation-driven/>
+
+    <!--配置jdbc.properties文件的位置信息 路径还是区分大小写 -->
+    <bean
+            class="com.xlr.demo.utils.InitProperties">
+        <!--<property name="locations" value="classpath*:config/jdbc.properties,classpath*:config/redis.properties,classpath*:config/mchd.properties" />-->
+        <property name="locations">
+            <list>
+                <value>classpath:/config/jdbc.properties</value>
+                <value>classpath:/config/redis.properties</value>
+                <value>classpath:/config/mchd.properties</value>
+                <value>classpath:/config/jms.properties</value>
+            </list>
+        </property>
+    </bean>
+
+    <!-- 扫描所有的bean 但是不扫描Controller -->
+    <context:component-scan base-package="com.xlr.demo">
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller" />
+    </context:component-scan>
+
+    <!-- 启用@AspectJ切面声明 -->
+    <aop:aspectj-autoproxy/>
+    <!-- spring bean Util -->
+    <bean id="appactionContextUtil" class="com.xlr.demo.utils.AppactionContextUtil"></bean>
+
+    <!--redis init -->
+    <bean id="redisUtil" class="com.xlr.demo.util.redis.RedisUtil"/>
+</beans>
